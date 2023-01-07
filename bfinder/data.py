@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from split_image import split_image, reverse_split
 import os
+import shutil
 
 class DataETL:
     def __init__(self, data_dir, output_path):
@@ -41,7 +42,7 @@ class DataETL:
             result = result.stdout.split('\n')[:-1]
             
             for fn in result:
-                file_list.append(fn.split('/')[-1])
+                file_list.append(os.path.basename(fn))
                 
         self.pos_examples = set(file_list)
     
@@ -82,7 +83,19 @@ class DataETL:
            # Create a new directory because it does not exist
            os.makedirs(path)
            print(f"The new directory {path} is created!")
-    
+           
+    @staticmethod
+    def _copy_files(file_list, tgt_dir):
+        try:
+            for src_file_path in file_list:
+                file_name = os.path.basename(src_file_path)
+                tgt_file_path = os.path.join(tgt_dir, file_name)
+                if os.path.isfile(src_file_path):
+                    shutil.copy(src_file_path, tgt_file_path)
+            print('copy files successfully')
+        except Exception as e:
+            print('error copy files! Due to:',e)
+        
     def get_head_crops(self, visualize=False):
         
         self._util_creat_folder(self.output_path)
@@ -106,7 +119,7 @@ class DataETL:
                 cropped_image = img[y-50:y1+50, x-50:x1+50]
                     
                 # Save the cropped image
-                fn = output_path + f"h_{file.split('/')[-1]}.jpg"
+                fn = output_path + f"h_{os.path.basename(file)}.jpg"
                 cv2.imwrite(fn, cropped_image)
                 self.all_examples.add(fn)
                 
@@ -123,8 +136,8 @@ class DataETL:
             
     
     def get_data_splits(self, train_size=0.8):
-        self.train_path = self.data_dir + 'train'
-        self.val_path = self.data_dir + 'val'
+        self.train_path = os.path.join(self.data_dir, 'train')
+        self.val_path = os.path.join(self.data_dir, 'val')
         
         self._util_creat_folder(self.train_path)
         self._util_creat_folder(self.val_path)
@@ -135,6 +148,9 @@ class DataETL:
                          replace=False)
         self.train_examples = set(train_examples)
         self.val_examples = self.all_examples - self.train_examples
+        # copy files into folders
+        self._copy_files(self.train_examples, self.train_path)
+        self._copy_files(self.val_examples, self.val_path)
 
 
 if __name__ == '__main__':

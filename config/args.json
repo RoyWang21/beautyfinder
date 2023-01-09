@@ -1,0 +1,10 @@
+{
+"num_epochs" : 5,
+"lr" : 0.001,
+"momentum" : 0.9,
+"step_size" : 7,
+"gamma" : 0.1,
+"batch_size" : 8,
+"img_height" : 300,
+"img_width" : 300
+}

@@ -14,6 +14,11 @@ import os
 from PIL import Image
 import pathlib
 import copy
+from pathlib import Path
+
+from config import config
+import argparse
+import json
 
 
 class Trainer:
@@ -239,6 +244,9 @@ class Preprocessor:
 if __name__ == '__main__':
     #################################### HPs
     
+    img_height = 300
+    img_width = 300
+    
     num_epochs = 5
     lr = 0.001
     momentum = 0.9
@@ -255,12 +263,12 @@ if __name__ == '__main__':
      'IMG_3171.JPG', 'IMG_2327.JPG', 'IMG_3056.JPG', 'IMG_9052.JPG', 'IMG_0913.JPG', 
      'IMG_8721.JPG', 'IMG_8730.JPG', 'IMG_3135.JPG'}
     
-    pos_examples = ['h_' + i.split('.')[0] + '.jpg' for i in pos_examples]
+    pos_examples = ['h_' + Path(i).stem + '.jpg' for i in pos_examples]
     print(pos_examples)
     
     preproc = Preprocessor(data_path,
-                           img_height=300,
-                           img_width=300)
+                           img_height=img_height,
+                           img_width=img_width)
     preproc.get_data_labels(pos_examples)
     
     #################################### model

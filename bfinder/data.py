@@ -45,6 +45,13 @@ class DataETL:
                 file_list.append(os.path.basename(fn))
                 
         self.pos_examples = set(file_list)
+        try:
+            with open(os.path.join(data_dir,'positive_examples.txt'), 'a') as pos_file:
+                for fn in self.pos_examples:
+                    pos_file.write(fn + '\n')
+            print('positive examples written into file')
+        except Exception as e:
+            print('error due to:', e)
     
     @staticmethod
     def _detect_face(img, model):
@@ -164,3 +171,4 @@ if __name__ == '__main__':
     print('all_example',data_etl.all_examples)
     print('train_example',data_etl.train_examples)
     print('val_example',data_etl.val_examples)
+    

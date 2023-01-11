@@ -16,9 +16,9 @@ import pathlib
 import copy
 from pathlib import Path
 
-from config import config
-import argparse
-import json
+# from config import config
+# import argparse
+# import json
 
 
 class Trainer:
@@ -258,10 +258,12 @@ if __name__ == '__main__':
     
     #################################### preprocessing
     
-    pos_examples = {'IMG_2930.JPG', 'IMG_3176.JPG', 'IMG_2594.JPG', 'IMG_2492.JPG', 'IMG_8189.JPG',
-     'IMG_2902.JPG', 'IMG_3170.JPG', 'IMG_2079.JPG', 'IMG_2951.JPG', 'IMG_3200.JPG',
-     'IMG_3171.JPG', 'IMG_2327.JPG', 'IMG_3056.JPG', 'IMG_9052.JPG', 'IMG_0913.JPG', 
-     'IMG_8721.JPG', 'IMG_8730.JPG', 'IMG_3135.JPG'}
+    pos_examples = set()
+    with open(os.path.join(data_path,'positive_examples.txt'), 'r') as pos_file:
+        lines = [line for line in pos_file]
+    for fn in lines:
+        pos_examples.add(fn)
+    print(pos_examples)
     
     pos_examples = ['h_' + Path(i).stem + '.jpg' for i in pos_examples]
     print(pos_examples)

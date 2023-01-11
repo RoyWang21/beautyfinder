@@ -10,7 +10,8 @@ import shutil
 class DataETL:
     def __init__(self, data_dir, output_path):
         self.data_dir = data_dir
-        self.output_path = output_path
+        self.raw_path = os.path.join(data_dir, 'raw')
+        self.output_path = os.path.join(data_dir, 'crop_head')
         self.modelFile = "pretrained_models/res10_300x300_ssd_iter_140000.caffemodel"
         self.configFile = "pretrained_models/deploy.prototxt.txt"
         self.all_examples = set()
@@ -37,7 +38,7 @@ class DataETL:
         
         file_list = []
         for cl in tag_clrs:
-            query_pos = ["mdfind", "-onlyin",  f"{self.data_dir}", f"kMDItemUserTags == {cl}"]
+            query_pos = ["mdfind", "-onlyin",  f"{self.raw_path}", f"kMDItemUserTags == {cl}"]
             result = subprocess.run(query_pos, stdout=subprocess.PIPE, text=True)
             result = result.stdout.split('\n')[:-1]
             
@@ -92,7 +93,7 @@ class DataETL:
            print(f"The new directory {path} is created!")
            
     @staticmethod
-    def _copy_files(file_list, tgt_dir):
+    def _util_copy_files(file_list, tgt_dir):
         try:
             for src_file_path in file_list:
                 file_name = os.path.basename(src_file_path)
@@ -103,17 +104,16 @@ class DataETL:
         except Exception as e:
             print('error copy files! Due to:',e)
         
-    def get_head_crops(self, visualize=False):
+    def get_head_crops(self, margin = 300, visualize=False):
         
         self._util_creat_folder(self.output_path)
        
-        imgdir_path = pathlib.Path(self.data_dir)
+        imgdir_path = pathlib.Path(self.raw_path)
         file_list = sorted([str(path) for path in imgdir_path.glob('*.JPG')])
         file_list = [fn.split('.')[0] for fn in file_list]
         print(file_list)
         
         net = self._load_face_model()
-        
         for file in file_list:
             img = cv2.imread(file+'.JPG')
             face_found, head_box = self._detect_face(img, net)
@@ -123,7 +123,7 @@ class DataETL:
                 x, y, x1, y1 = head_box
                 # img_box = cv2.rectangle(img, (0, 0), (100, 100), (0, 0, 255), 2)
                 img_box = cv2.rectangle(img, (x-50, y-50), (x1+50, y1+50), (0, 0, 255), 2)
-                cropped_image = img[y-50:y1+50, x-50:x1+50]
+                cropped_image = img[y-margin:y1+margin, x-margin:x1+margin]
                     
                 # Save the cropped image
                 fn = output_path + f"h_{os.path.basename(file)}.jpg"
@@ -156,8 +156,8 @@ class DataETL:
         self.train_examples = set(train_examples)
         self.val_examples = self.all_examples - self.train_examples
         # copy files into folders
-        self._copy_files(self.train_examples, self.train_path)
-        self._copy_files(self.val_examples, self.val_path)
+        self._util_copy_files(self.train_examples, self.train_path)
+        self._util_copy_files(self.val_examples, self.val_path)
 
 
 if __name__ == '__main__':

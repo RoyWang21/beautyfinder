@@ -1,0 +1,5 @@
+
+*.jpg
+venv/lib/python3.7/site-packages/torch/lib/libtorch_cpu.dylib
+venv/
+.idea/

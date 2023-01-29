@@ -167,7 +167,7 @@ pos_examples = ['Cropped_IMG_0913.jpg', 'Cropped_IMG_8721.jpg','Cropped_IMG_8730
                 'Cropped_IMG_2902.jpg','Cropped_IMG_2930.jpg', 'Cropped_IMG_3170.jpg','Cropped_IMG_3171.jpg']
 labels = {x:[1 if fn.split('/')[1] in pos_examples else 0 for fn in file_list[x]]
           for x in ['train', 'val']}
-# use subprocess: mdfind -onlyin "`pwd`" "kMDItemUserTags == Red"
+# use subprocess: mdfind -onlyin . "kMDItemUserTags == Red"
 image_datasets = {x: ImageDataset(file_list[x], labels[x], init_transform[x])
                  for x in ['train', 'val']}
 

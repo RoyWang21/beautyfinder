@@ -1,4 +1,5 @@
 if __name__ == "__main__":
+    # main file to parse args and execute
     from pathlib import Path
     from config import config
     from bfinder import train, utils
